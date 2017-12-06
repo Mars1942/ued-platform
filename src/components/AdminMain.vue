@@ -1,5 +1,5 @@
 <template>
-  <el-container>
+  <el-container class="box">
     <el-header>
       <el-row>
         <el-col :span="24" class="header-top">&nbsp;</el-col>
@@ -29,27 +29,29 @@
         </el-col>
       </el-row>
     </el-header>
-    <el-container class="el-main-container">
-      <el-aside width="200px">
-        <el-menu default-active="1" router="true">
-          <el-menu-item index="/admin-main/user-list">
-            <i class="el-icon-fa-user-o"></i>
-            <span>用户管理</span>
-          </el-menu-item>
-          <el-menu-item index="/admin-main/app-list">
-            <i class="el-icon-menu"></i>
-            <span>功能管理</span>
-          </el-menu-item>
-          <el-menu-item index="/admin-main/role-list">
-            <i class="el-icon-fa-user-secret"></i>
-            <span>角色管理</span>
-          </el-menu-item>
-        </el-menu>
-      </el-aside>
-      <el-main>
-        <router-view/>
-      </el-main>
-    </el-container>
+    <div class="main-container">
+      <el-container class="el-main-container">
+        <el-aside width="200px">
+          <el-menu default-active="/admin-main/user-list" router="true">
+            <el-menu-item index="/admin-main/user-list">
+              <i class="el-icon-fa-user-o"></i>
+              <span>用户管理</span>
+            </el-menu-item>
+            <el-menu-item index="/admin-main/app-list">
+              <i class="el-icon-menu"></i>
+              <span>功能管理</span>
+            </el-menu-item>
+            <el-menu-item index="/admin-main/role-list">
+              <i class="el-icon-fa-user-secret"></i>
+              <span>角色管理</span>
+            </el-menu-item>
+          </el-menu>
+        </el-aside>
+        <el-main>
+          <router-view/>
+        </el-main>
+      </el-container>
+    </div>
   </el-container>
 </template>
 <script>
@@ -58,7 +60,8 @@
   export default {
     components: {
       ElCol,
-      ElRow},
+      ElRow
+    },
     data() {
       return {}
     },
@@ -78,6 +81,7 @@
 <style lang="less" scoped>
   @import './../style';
 
+  .box{height:100%;}
   .row-center {
     align-items: center;
   }
@@ -104,7 +108,13 @@
   }
 
   .el-container {
-    height: 100%;
+    align-items:stretch;
+    background: @container-bg-color;
+  }
+
+  .main-container {
+    height:100%;
+    overflow: auto;
     background: @container-bg-color;
   }
 
@@ -120,17 +130,24 @@
   .el-main {
     background: @color-bg-white;
     padding: 0;
+    min-height:600px;
   }
 
   .el-menu {
     height: 100%;
   }
 
-  .user-row{
-    width:150px;
-    font-size:14px;
-    align-items:baseline;
+  .user-row {
+    width: 150px;
+    font-size: 14px;
+    align-items: baseline;
   }
-  .text-center{text-align: center;}
-  .user-image{font-size:25px}
+
+  .text-center {
+    text-align: center;
+  }
+
+  .user-image {
+    font-size: 25px
+  }
 </style>

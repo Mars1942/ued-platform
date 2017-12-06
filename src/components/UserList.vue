@@ -87,9 +87,7 @@
 </template>
 
 <script>
-  import ElRow from "element-ui/packages/row/src/row";
   export default {
-    components: {ElRow},
     data() {
       return {
         form: {
@@ -102,6 +100,41 @@
           age: 23,
           role: 'student'
         }, {
+          sex: 1,
+          name: '王小虎',
+          age: 23,
+          role: 'teacher'
+        }, {
+          sex: 0,
+          name: '王小虎',
+          age: 23,
+          role: 'admin'
+        },{
+          sex: 1,
+          name: '王小虎',
+          age: 23,
+          role: 'teacher'
+        }, {
+          sex: 0,
+          name: '王小虎',
+          age: 23,
+          role: 'admin'
+        },{
+          sex: 0,
+          name: '王小虎',
+          age: 23,
+          role: 'student'
+        }, {
+          sex: 1,
+          name: '王小虎',
+          age: 23,
+          role: 'teacher'
+        }, {
+          sex: 0,
+          name: '王小虎',
+          age: 23,
+          role: 'admin'
+        },{
           sex: 1,
           name: '王小虎',
           age: 23,
@@ -142,7 +175,7 @@
   }
 
   .pagination-container {
-    padding: 10px 20px;
+    padding: 20px 10px 20px 20px;
   }
 
   .pagination-container > * {
