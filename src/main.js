@@ -21,13 +21,9 @@ Vue.http.interceptors.push(function (request, next) {
   });
   next(function (response) {
     loading.close();
-    if (response.body){
-      return response.body;
-    }else{
-      return response.bodyText;
-    }
+    return response;
   })
-})
+});
 new Vue({
   el: '#app',
   router,

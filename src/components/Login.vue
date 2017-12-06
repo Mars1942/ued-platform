@@ -9,9 +9,9 @@
           <img src="./../assets/logo.png"/>
         </el-col>
         <el-col :span="6" class="row-center">
-          <h2>
-            运维管理平台
-          </h2>
+          <span class="title">
+            学生选课系统
+          </span>
         </el-col>
       </el-row>
     </el-header>
@@ -20,9 +20,9 @@
         <el-col :span="8" class="login-container">
           <el-row type="flex" justify="start">
             <el-col :span="24" class="login-text">
-              <h4>
+              <h3>
                 登录
-              </h4>
+              </h3>
             </el-col>
           </el-row>
           <el-form :model="loginForm" :rules="rules" ref="loginForm">
@@ -35,7 +35,7 @@
                         auto-complete="off"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="success" @click="submitForm('loginForm')">提交</el-button>
+              <el-button type="primary" @click="submitForm('loginForm')">提交</el-button>
             </el-form-item>
           </el-form>
         </el-col>
@@ -66,20 +66,20 @@
     },
     methods: {
       submitForm(formName) {
+
         this.$refs[formName].validate((valid) => {
           if (valid) {
-
-            this.$http.post('/server/user/login',this.loginForm).then(function (response) {
+            this.$http.post('/server/user/login', this.loginForm).then(response => {
               // 响应成功回调
-              console.log(response);
-//              loading.close();
-            }, function (response) {
-              // 响应错误回调
-              console.log(response);
-//              loading.close();
+              console.log(this);
+              this.$message({
+                message: '登录成功',
+                type: 'success'
+              });
+              this.$router.push('/admin-main/user-list');
             });
           } else {
-            console.log('error submit!!');
+            this.$message.error('登录失败');
             return false;
           }
         });
@@ -89,7 +89,8 @@
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
+<style lang="less" scoped>
+  @import './../style';
   .row-center {
     align-items: center;
   }
@@ -105,29 +106,30 @@
     height: 56px;
   }
 
-  h2 {
+  .title {
     margin: 0;
+    font-size: 20px;
   }
 
   .header-top {
-    background: #44B549;
+    background: @base-color;
     height: 5px;
   }
 
   .el-container {
     height: 100%;
-    background: #E9E9EB;
+    background: @container-bg-color;
   }
 
   .login-container {
     background: #fff;
     padding: 0 1.33em;
     box-shadow: 0 0 2px #888;
-    margin-top: 10%;
+    margin-top: 100px;
   }
 
   .login-text {
-    color: #44B549;
+    color: @base-color;
   }
 
   .login-text > h4 {
