@@ -21,6 +21,7 @@ export default new Router({
       path: '/admin-main',
       name: 'AdminMain',
       component: AdminMain,
+      redirect:'/admin-main/user-list',
       children: [
         {
           path: 'user-list',

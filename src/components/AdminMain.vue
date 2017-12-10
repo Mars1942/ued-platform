@@ -32,7 +32,7 @@
     <div class="main-container">
       <el-container class="el-main-container">
         <el-aside width="200px">
-          <el-menu default-active="/admin-main/user-list" router="true">
+          <el-menu default-active="/admin-main/user-list" router>
             <el-menu-item index="/admin-main/user-list">
               <i class="el-icon-fa-user-o"></i>
               <span>用户管理</span>
@@ -114,6 +114,7 @@
 
   .main-container {
     height:100%;
+    margin-top: 1px;
     overflow: auto;
     background: @container-bg-color;
   }

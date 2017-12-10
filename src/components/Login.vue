@@ -45,6 +45,7 @@
 </template>
 
 <script>
+  import Constant from '../global/Constant'
   export default {
     data () {
       return {
@@ -66,21 +67,13 @@
     },
     methods: {
       submitForm(formName) {
-
         this.$refs[formName].validate((valid) => {
           if (valid) {
-            this.$http.post('/server/user/login', this.loginForm).then(response => {
-              // 响应成功回调
-              console.log(this);
-              this.$message({
-                message: '登录成功',
-                type: 'success'
-              });
-              this.$router.push('/admin-main/user-list');
+            this.$http.post('http://localhost:8080/user/login', this.loginForm).then(response => {
+//              if (response.body.code == 1) {
+                this.$router.push('/admin-main');
+//              }
             });
-          } else {
-            this.$message.error('登录失败');
-            return false;
           }
         });
       }

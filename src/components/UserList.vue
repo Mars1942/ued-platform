@@ -16,13 +16,19 @@
         <el-input type="input" placeholder="关键字" prefix-icon="el-icon-search" v-model="form.name"></el-input>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="onSubmit">查询</el-button>
+        <el-button type="primary">查询</el-button>
       </el-form-item>
     </el-form>
+    <el-row type="flex" justify="end" class="btn-container">
+      <el-col :span="6" style="text-align: end;">
+        <el-button type="success" size="mini" @click="openAdd"><i class="el-icon-plus"></i>&nbsp;&nbsp;添加新用户
+        </el-button>
+      </el-col>
+    </el-row>
     <div class="table-container">
-      <el-table stripe
-                :data="tableData"
-                style="width: 100%">
+      <el-table
+        :data="tableData"
+        style="width: 100%">
         <el-table-column
           prop="name"
           label="姓名">
@@ -63,11 +69,13 @@
           <template slot-scope="scope">
             <el-button
               size="mini"
-              @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+              @click="openEdit(scope.$index, scope.row)">编辑
+            </el-button>
             <el-button
               size="mini"
               type="danger"
-              @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+              @click="handleDelete(scope.$index, scope.row)">删除
+            </el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -77,79 +85,140 @@
       <el-pagination
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
-        :current-page="currentPage4"
-        :page-size="10"
+        :current-page="pagination.number"
+        :page-size="pagination.size"
         layout="total, prev, pager, next, jumper"
-        :total="400">
+        :total="pagination.total">
       </el-pagination>
     </div>
+
+
+    <el-dialog :title="isUpdateForm ? '修改用户':'添加新用户'" :visible.sync="formVisible">
+      <el-form :model="addForm" class="form-add" label-width="80px">
+        <el-form-item label="姓名">
+          <el-input v-model="addForm.name" placeholder="请输入姓名"></el-input>
+        </el-form-item>
+        <el-form-item label="密码">
+          <el-input :type="showPassword ? 'text':'password'" placeholder="请输入密码" v-model="addForm.passWord"></el-input>
+        </el-form-item>
+        <el-form-item label="重复密码">
+          <el-input :type="showPassword ? 'text':'password'" placeholder="请再次输入密码"
+                    v-model="addForm.repeatPassWord"></el-input>
+          <el-switch
+            v-model="showPassword"
+            active-text="显示密码">
+          </el-switch>
+
+        </el-form-item>
+        <el-form-item label="性别">
+          <el-select v-model="addForm.sex" placeholder="请选择性别">
+            <el-option label="男" value="0"></el-option>
+            <el-option label="女" value="1"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="年龄">
+          <el-input-number v-model="addForm.age" :min="1" :max="200"></el-input-number>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="formVisible = false">取 消</el-button>
+        <el-button v-if="isUpdateForm" type="success" @click="handleUpdate">修 改</el-button>
+        <el-button v-if="!isUpdateForm" type="success" @click="handleAdd">添 加</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
+  import Constant from '../global/Constant'
   export default {
+    created() {
+      this.getList();
+    },
     data() {
       return {
+        pagination: {
+          number: 1,
+          size: 10,
+          total: 0
+        },
         form: {
           name: '',
           role: ''
         },
-        tableData: [{
-          sex: 0,
-          name: '王小虎',
-          age: 23,
-          role: 'student'
-        }, {
-          sex: 1,
-          name: '王小虎',
-          age: 23,
-          role: 'teacher'
-        }, {
-          sex: 0,
-          name: '王小虎',
-          age: 23,
-          role: 'admin'
-        },{
-          sex: 1,
-          name: '王小虎',
-          age: 23,
-          role: 'teacher'
-        }, {
-          sex: 0,
-          name: '王小虎',
-          age: 23,
-          role: 'admin'
-        },{
-          sex: 0,
-          name: '王小虎',
-          age: 23,
-          role: 'student'
-        }, {
-          sex: 1,
-          name: '王小虎',
-          age: 23,
-          role: 'teacher'
-        }, {
-          sex: 0,
-          name: '王小虎',
-          age: 23,
-          role: 'admin'
-        },{
-          sex: 1,
-          name: '王小虎',
-          age: 23,
-          role: 'teacher'
-        }, {
-          sex: 0,
-          name: '王小虎',
-          age: 23,
-          role: 'admin'
-        }]
+        formVisible: false,
+        isUpdateForm: false,
+        showPassword: false,
+        addForm: {
+          id: '',
+          name: '',
+          loginName: '',
+          passWord: '',
+          repeatPassWord: '',
+          age: '',
+          sex: ''
+        },
+        tableData: []
       }
     },
     methods: {
-      onSubmit() {
-        console.log('submit!');
+      getList(){
+        this.$http.get(Constant.PATH_USER_LIST, {params: {'pageNumber': this.pagination.number - 1}}).then(response => {
+          this.tableData = response.body.result.content;
+          this.pagination.size = response.body.result.size;
+          this.pagination.total = response.body.result.totalElements;
+        });
+      },
+      handleSizeChange(){
+
+      },
+      handleCurrentChange(currentPage){
+        this.pagination.number = currentPage;
+        this.getList();
+      },
+      openAdd(){
+        this.formVisible = true;
+        this.isUpdateForm = false;
+        this.addForm = {};
+      },
+      openEdit(index, entity){
+        this.addForm = {};
+        this.$http.get(Constant.PATH_USER + entity.id, {}).then(response => {
+          this.addForm = response.body.result;
+          this.formVisible = true;
+          this.isUpdateForm = true;
+        });
+      },
+      handleDelete(index, entity){
+        this.openConfirm(entity.id);
+      },
+      handleAdd() {
+        this.$http.post(Constant.PATH_USER_ADD, this.addForm).then(response => {
+          this.getList();
+        });
+      },
+      handleUpdate(){
+        this.$http.put(Constant.PATH_USER + this.addForm.id, this.addForm).then(response => {
+          this.formVisible = false;
+          this.getList();
+        });
+      },
+      openConfirm(id) {
+        this.$confirm('此操作将永久删除该数据, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.$http.delete(Constant.PATH_USER + id).then(response => {
+            this.formVisible = false;
+            this.getList();
+          });
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          });
+        });
       }
     }
   }
@@ -181,5 +250,13 @@
   .pagination-container > * {
     width: 600px;
     margin: 0 auto;
+  }
+
+  .btn-container {
+    padding: 20px;
+  }
+
+  .form-add .el-select {
+    width: 100%;
   }
 </style>
