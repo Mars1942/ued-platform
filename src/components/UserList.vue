@@ -69,12 +69,12 @@
           <template slot-scope="scope">
             <el-button
               size="mini"
-              @click="openEdit(scope.$index, scope.row)">编辑
+              @click="openEdit(scope.row.id)">编辑
             </el-button>
             <el-button
               size="mini"
               type="danger"
-              @click="handleDelete(scope.$index, scope.row)">删除
+              @click="handleDelete(scope.row.id)">删除
             </el-button>
           </template>
         </el-table-column>
@@ -94,21 +94,21 @@
 
 
     <el-dialog :title="isUpdateForm ? '修改用户':'添加新用户'" :visible.sync="formVisible">
-      <el-form :model="addForm" class="form-add" label-width="80px">
-        <el-form-item label="姓名">
+      <el-form :model="addForm" :rules="rules" ref="addForm" class="form-add" label-width="80px">
+        <el-form-item label="姓名" prop="name">
           <el-input v-model="addForm.name" placeholder="请输入姓名"></el-input>
         </el-form-item>
-        <el-form-item label="密码">
+        <el-form-item label="登录名">
+          <el-input v-model="addForm.loginName" placeholder="请输入姓名"></el-input>
+        </el-form-item>
+        <el-form-item label="密码" prop="passWord">
           <el-input :type="showPassword ? 'text':'password'" placeholder="请输入密码" v-model="addForm.passWord"></el-input>
         </el-form-item>
-        <el-form-item label="重复密码">
-          <el-input :type="showPassword ? 'text':'password'" placeholder="请再次输入密码"
-                    v-model="addForm.repeatPassWord"></el-input>
+        <el-form-item>
           <el-switch
             v-model="showPassword"
             active-text="显示密码">
           </el-switch>
-
         </el-form-item>
         <el-form-item label="性别">
           <el-select v-model="addForm.sex" placeholder="请选择性别">
@@ -154,11 +154,20 @@
           name: '',
           loginName: '',
           passWord: '',
-          repeatPassWord: '',
-          age: '',
-          sex: ''
+          age: 0,
+          sex: 0,
         },
-        tableData: []
+        tableData: [],
+        rules: {
+          name: [
+            {required: true, message: '用户名不能为空', trigger: 'blur'},
+            {min: 1, max: 12, message: '长度在 1 到 12 个字符', trigger: 'blur'}
+          ],
+          passWord: [
+            {required: true, message: '密码不能为空', trigger: 'blur'},
+            {min: 1, max: 12, message: '长度在 1 到 12 个字符', trigger: 'blur'}
+          ]
+        }
       }
     },
     methods: {
@@ -181,26 +190,37 @@
         this.isUpdateForm = false;
         this.addForm = {};
       },
-      openEdit(index, entity){
+      openEdit(id){
         this.addForm = {};
-        this.$http.get(Constant.PATH_USER + entity.id, {}).then(response => {
+        this.$http.get(Constant.PATH_USER + id).then(response => {
+          if (response.body.result.sex != null) {
+            response.body.result.sex += '';
+          }
           this.addForm = response.body.result;
           this.formVisible = true;
           this.isUpdateForm = true;
         });
       },
-      handleDelete(index, entity){
-        this.openConfirm(entity.id);
+      handleDelete(id){
+        this.openConfirm(id);
       },
       handleAdd() {
-        this.$http.post(Constant.PATH_USER_ADD, this.addForm).then(response => {
-          this.getList();
+        this.$refs.addForm.validate((valid) => {
+          if (valid) {
+            this.$http.post(Constant.PATH_USER_ADD, this.addForm).then(response => {
+              this.getList();
+            });
+          }
         });
       },
       handleUpdate(){
-        this.$http.put(Constant.PATH_USER + this.addForm.id, this.addForm).then(response => {
-          this.formVisible = false;
-          this.getList();
+        this.$refs.addForm.validate((valid) => {
+          if (valid) {
+            this.$http.put(Constant.PATH_USER + this.addForm.id, this.addForm).then(response => {
+              this.formVisible = false;
+              this.getList();
+            });
+          }
         });
       },
       openConfirm(id) {
