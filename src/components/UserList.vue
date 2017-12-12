@@ -94,14 +94,14 @@
 
 
     <el-dialog :title="isUpdateForm ? '修改用户':'添加新用户'" :visible.sync="formVisible">
-      <el-form :model="addForm" :rules="rules" ref="addForm" class="form-add" label-width="80px">
-        <el-form-item label="姓名" prop="name">
+      <el-form :model="addForm" :rules="rules" ref="addForm" class="form-add" label-width="100px">
+        <el-form-item label="用户姓名：" prop="name">
           <el-input v-model="addForm.name" placeholder="请输入姓名"></el-input>
         </el-form-item>
-        <el-form-item label="登录名">
+        <el-form-item label="登录名：">
           <el-input v-model="addForm.loginName" placeholder="请输入姓名"></el-input>
         </el-form-item>
-        <el-form-item label="密码" prop="passWord">
+        <el-form-item label="密码：" prop="passWord">
           <el-input :type="showPassword ? 'text':'password'" placeholder="请输入密码" v-model="addForm.passWord"></el-input>
         </el-form-item>
         <el-form-item>
@@ -110,13 +110,13 @@
             active-text="显示密码">
           </el-switch>
         </el-form-item>
-        <el-form-item label="性别">
+        <el-form-item label="用户性别：">
           <el-select v-model="addForm.sex" placeholder="请选择性别">
             <el-option label="男" value="0"></el-option>
             <el-option label="女" value="1"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="年龄">
+        <el-form-item label="用户年龄：">
           <el-input-number v-model="addForm.age" :min="1" :max="200"></el-input-number>
         </el-form-item>
       </el-form>
@@ -207,7 +207,8 @@
       handleAdd() {
         this.$refs.addForm.validate((valid) => {
           if (valid) {
-            this.$http.post(Constant.PATH_USER_ADD, this.addForm).then(response => {
+            this.$http.post(Constant.PATH_USER, this.addForm).then(response => {
+              this.formVisible = false;
               this.getList();
             });
           }

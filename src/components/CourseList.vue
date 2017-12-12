@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="title">
-      角色管理
+      课程管理
     </div>
     <el-form ref="form" :inline="true" :model="form" class="form-search">
       <el-form-item>
@@ -13,7 +13,7 @@
     </el-form>
     <el-row type="flex" justify="end" class="btn-container">
       <el-col :span="6" style="text-align: end;">
-        <el-button type="success" size="mini" @click="openAdd"><i class="el-icon-plus"></i>&nbsp;&nbsp;添加新角色
+        <el-button type="success" size="mini" @click="openAdd"><i class="el-icon-plus"></i>&nbsp;&nbsp;添加新课程
         </el-button>
       </el-col>
     </el-row>
@@ -23,7 +23,27 @@
         style="width: 100%">
         <el-table-column
           prop="name"
-          label="角色名">
+          label="课程名">
+        </el-table-column>
+        <el-table-column
+          prop="time"
+          label="时长">
+        </el-table-column>
+        <el-table-column
+          prop="hasCount"
+          label="已选课人数">
+        </el-table-column>
+        <el-table-column
+          prop="count"
+          label="总人数">
+        </el-table-column>
+        <el-table-column
+          prop="teacherName"
+          label="教师">
+        </el-table-column>
+        <el-table-column
+          prop="memo"
+          label="备注">
         </el-table-column>
         <el-table-column
           label="操作">
@@ -54,10 +74,16 @@
     </div>
 
 
-    <el-dialog :title="isUpdateForm ? '修改角色':'添加新角色'" :visible.sync="formVisible">
+    <el-dialog :title="isUpdateForm ? '修改课程':'添加新课程'" :visible.sync="formVisible">
       <el-form :model="addForm" :rules="rules" ref="addForm" class="form-add" label-width="100px">
-        <el-form-item label="角色名称：" prop="name">
-          <el-input v-model="addForm.name" placeholder="请输入角色名称"></el-input>
+        <el-form-item label="课程名称：" prop="name">
+          <el-input v-model="addForm.name" placeholder="请输入课程名称"></el-input>
+        </el-form-item>
+        <el-form-item label="课程时长：">
+          <el-input-number v-model="addForm.time" :min="30" :max="240"></el-input-number>（分钟）
+        </el-form-item>
+        <el-form-item label="总座位数：" prop="count">
+          <el-input-number v-model="addForm.count" :min="1" :max="1000"></el-input-number>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -95,7 +121,11 @@
         tableData: [],
         rules: {
           name: [
-            {required: true, message: '角色名不能为空', trigger: 'blur'},
+            {required: true, message: '课程名不能为空', trigger: 'blur'},
+            {min: 1, max: 12, message: '长度在 1 到 12 个字符', trigger: 'blur'}
+          ],
+          teacherName: [
+            {required: true, message: '教师姓名不能为空', trigger: 'blur'},
             {min: 1, max: 12, message: '长度在 1 到 12 个字符', trigger: 'blur'}
           ]
         }
@@ -103,7 +133,7 @@
     },
     methods: {
       getList(){
-        this.$http.get(Constant.PATH_ROLE_LIST, {params: {'pageNumber': this.pagination.number - 1}}).then(response => {
+        this.$http.get(Constant.PATH_COURSE_LIST, {params: {'pageNumber': this.pagination.number - 1}}).then(response => {
           this.tableData = response.body.result.content;
           this.pagination.size = response.body.result.size;
           this.pagination.total = response.body.result.totalElements;
@@ -123,7 +153,7 @@
       },
       openEdit(id){
         this.addForm = {};
-        this.$http.get(Constant.PATH_ROLE + id).then(response => {
+        this.$http.get(Constant.PATH_COURSE + id).then(response => {
           this.addForm = response.body.result;
           this.formVisible = true;
           this.isUpdateForm = true;
@@ -135,7 +165,7 @@
       handleAdd() {
         this.$refs.addForm.validate((valid) => {
           if (valid) {
-            this.$http.post(Constant.PATH_ROLE, this.addForm).then(response => {
+            this.$http.post(Constant.PATH_COURSE, this.addForm).then(response => {
               this.formVisible = false;
               this.getList();
             });
@@ -145,7 +175,7 @@
       handleUpdate(){
         this.$refs.addForm.validate((valid) => {
           if (valid) {
-            this.$http.put(Constant.PATH_ROLE + this.addForm.id, this.addForm).then(response => {
+            this.$http.put(Constant.PATH_COURSE + this.addForm.id, this.addForm).then(response => {
               this.formVisible = false;
               this.getList();
             });
@@ -158,7 +188,7 @@
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          this.$http.delete(Constant.PATH_ROLE + id).then(response => {
+          this.$http.delete(Constant.PATH_COURSE + id).then(response => {
             this.formVisible = false;
             this.getList();
           });

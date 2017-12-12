@@ -45,6 +45,10 @@
               <i class="el-icon-fa-user-secret"></i>
               <span>角色管理</span>
             </el-menu-item>
+            <el-menu-item index="/admin-main/course-list">
+              <i class="el-icon-fa-graduation-cap"></i>
+              <span>课程管理</span>
+            </el-menu-item>
           </el-menu>
         </el-aside>
         <el-main>

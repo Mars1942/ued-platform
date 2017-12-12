@@ -70,9 +70,9 @@
         this.$refs[formName].validate((valid) => {
           if (valid) {
             this.$http.post('http://localhost:8080/user/login', this.loginForm).then(response => {
-//              if (response.body.code == 1) {
+              if (response.body.code == 1) {
                 this.$router.push('/admin-main');
-//              }
+              }
             });
           }
         });
