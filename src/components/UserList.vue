@@ -119,6 +119,17 @@
         <el-form-item label="用户年龄：">
           <el-input-number v-model="addForm.age" :min="1" :max="200"></el-input-number>
         </el-form-item>
+        <el-form-item label="用户角色：">
+          <el-select multiple v-model="selectRoleList" placeholder="请选择">
+            <el-option
+              v-for="item in roleList"
+              :value="item.id"
+              :key="item.id"
+              :label="item.name"
+              >
+            </el-option>
+          </el-select>
+        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="formVisible = false">取 消</el-button>
@@ -134,6 +145,7 @@
   export default {
     created() {
       this.getList();
+      this.getRoleList();
     },
     data() {
       return {
@@ -156,7 +168,10 @@
           passWord: '',
           age: 0,
           sex: 0,
+          uToRList: []
         },
+        roleList: [],
+        selectRoleList: [],
         tableData: [],
         rules: {
           name: [
@@ -178,6 +193,15 @@
           this.pagination.total = response.body.result.totalElements;
         });
       },
+      getRoleList(){
+        this.$http.get(Constant.PATH_ROLE_LIST_ALL).then(response => {
+          this.roleList = response.body.result;
+        });
+      },
+      resetData(){
+        this.addForm = {};
+        this.selectRoleList = [];
+      },
       handleSizeChange(){
 
       },
@@ -188,10 +212,10 @@
       openAdd(){
         this.formVisible = true;
         this.isUpdateForm = false;
-        this.addForm = {};
+        this.resetData();
       },
       openEdit(id){
-        this.addForm = {};
+        this.resetData();
         this.$http.get(Constant.PATH_USER + id).then(response => {
           if (response.body.result.sex != null) {
             response.body.result.sex += '';
@@ -207,6 +231,7 @@
       handleAdd() {
         this.$refs.addForm.validate((valid) => {
           if (valid) {
+            this.addForm.uToRList = this.selectRoleList;
             this.$http.post(Constant.PATH_USER, this.addForm).then(response => {
               this.formVisible = false;
               this.getList();
