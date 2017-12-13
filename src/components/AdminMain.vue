@@ -119,7 +119,8 @@
   .main-container {
     height:100%;
     margin-top: 1px;
-    overflow: auto;
+    overflow-y: auto;
+    overflow-x: hidden;
     background: @container-bg-color;
   }
 
@@ -136,6 +137,8 @@
     background: @color-bg-white;
     padding: 0;
     min-height:600px;
+    overflow-y: auto;
+    overflow-x: hidden;
   }
 
   .el-menu {

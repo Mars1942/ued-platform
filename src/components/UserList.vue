@@ -30,8 +30,10 @@
         :data="tableData"
         style="width: 100%">
         <el-table-column
+          fixed
           prop="name"
-          label="姓名">
+          label="姓名"
+          width="120">
         </el-table-column>
         <el-table-column
           prop="sex"
@@ -65,7 +67,9 @@
           </template>
         </el-table-column>
         <el-table-column
-          label="操作">
+          fixed="right"
+          label="操作"
+          width="150">
           <template slot-scope="scope">
             <el-button
               size="mini"
