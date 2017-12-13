@@ -85,6 +85,9 @@
         <el-form-item label="总座位数：" prop="count">
           <el-input-number v-model="addForm.count" :min="1" :max="1000"></el-input-number>
         </el-form-item>
+        <el-form-item label="备注：" prop="name">
+          <el-input v-model="addForm.memo" placeholder="请输入备注"></el-input>
+        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="formVisible = false">取 消</el-button>
@@ -115,8 +118,7 @@
         isUpdateForm: false,
         showPassword: false,
         addForm: {
-          id: '',
-          name: ''
+          id: ''
         },
         tableData: [],
         rules: {
