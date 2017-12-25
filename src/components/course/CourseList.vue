@@ -22,7 +22,6 @@
         :data="tableData"
         style="width: 100%">
         <el-table-column
-          fixed
           prop="name"
           label="课程名"
           width="150">
@@ -48,7 +47,6 @@
           label="备注">
         </el-table-column>
         <el-table-column
-          fixed="right"
           label="操作"
           width="150">
           <template slot-scope="scope">
@@ -76,37 +74,16 @@
         :total="pagination.total">
       </el-pagination>
     </div>
-
-
-    <el-dialog :title="isUpdateForm ? '修改课程':'添加新课程'" :visible.sync="formVisible">
-      <el-form :model="addForm" :rules="rules" ref="addForm" class="form-add" label-width="100px">
-        <el-form-item label="课程名称：" prop="name">
-          <el-input v-model="addForm.name" placeholder="请输入课程名称"></el-input>
-        </el-form-item>
-        <el-form-item label="课程时长：">
-          <el-input-number v-model="addForm.time" :min="30" :max="240"></el-input-number>（分钟）
-        </el-form-item>
-        <el-form-item label="总座位数：" prop="count">
-          <el-input-number v-model="addForm.count" :min="1" :max="1000"></el-input-number>
-        </el-form-item>
-        <el-form-item label="备注：" prop="name">
-          <el-input v-model="addForm.memo" placeholder="请输入备注"></el-input>
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="formVisible = false">取 消</el-button>
-        <el-button v-if="isUpdateForm" type="success" @click="handleUpdate">修 改</el-button>
-        <el-button v-if="!isUpdateForm" type="success" @click="handleAdd">添 加</el-button>
-      </div>
-    </el-dialog>
   </div>
 </template>
 
 <script>
-  import Constant from '../global/Constant'
+  import Constant from '@/global/URLConstant'
+  import EventConstant from '@/global/EventConstant'
   export default {
     created() {
       this.getList();
+      this.$bus.emit(EventConstant.SHOW_BACK_BTN,{show:false});
     },
     data() {
       return {
@@ -117,12 +94,6 @@
         },
         form: {
           name: ''
-        },
-        formVisible: false,
-        isUpdateForm: false,
-        showPassword: false,
-        addForm: {
-          id: ''
         },
         tableData: [],
         rules: {
@@ -153,40 +124,13 @@
         this.getList();
       },
       openAdd(){
-        this.formVisible = true;
-        this.isUpdateForm = false;
-        this.addForm = {};
+        this.$router.push({name:'courseForm', params: { title:'添加课程',edit:false}});
       },
       openEdit(id){
-        this.addForm = {};
-        this.$http.get(Constant.PATH_COURSE + id).then(response => {
-          this.addForm = response.body.result;
-          this.formVisible = true;
-          this.isUpdateForm = true;
-        });
+        this.$router.push({name: 'courseForm', params: {title: '修改课程', id: id,edit:true}});
       },
       handleDelete(id){
         this.openConfirm(id);
-      },
-      handleAdd() {
-        this.$refs.addForm.validate((valid) => {
-          if (valid) {
-            this.$http.post(Constant.PATH_COURSE, this.addForm).then(response => {
-              this.formVisible = false;
-              this.getList();
-            });
-          }
-        });
-      },
-      handleUpdate(){
-        this.$refs.addForm.validate((valid) => {
-          if (valid) {
-            this.$http.put(Constant.PATH_COURSE + this.addForm.id, this.addForm).then(response => {
-              this.formVisible = false;
-              this.getList();
-            });
-          }
-        });
       },
       openConfirm(id) {
         this.$confirm('此操作将永久删除该数据, 是否继续?', '提示', {
@@ -195,7 +139,6 @@
           type: 'warning'
         }).then(() => {
           this.$http.delete(Constant.PATH_COURSE + id).then(response => {
-            this.formVisible = false;
             this.getList();
           });
         }).catch(() => {

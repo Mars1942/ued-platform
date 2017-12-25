@@ -5,18 +5,22 @@
     </div>
     <el-form ref="form" :inline="true" :model="form" class="form-search">
       <el-form-item label="选择角色">
-        <el-select v-model="form.role" placeholder="请选择角色">
+        <el-select v-model="form.roleCode" placeholder="请选择角色">
           <el-option label="全部角色" value=""></el-option>
-          <el-option label="教师" value="teacher"></el-option>
-          <el-option label="学生" value="student"></el-option>
-          <el-option label="管理员" value="admin"></el-option>
+          <el-option
+            v-for="item in roleList"
+            :key="item.id"
+            :value="item.code"
+            :label="item.name"
+          >
+          </el-option>
         </el-select>
       </el-form-item>
       <el-form-item>
         <el-input type="input" placeholder="关键字" prefix-icon="el-icon-search" v-model="form.name"></el-input>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary">查询</el-button>
+        <el-button type="primary" @click="getList()">查询</el-button>
       </el-form-item>
     </el-form>
     <el-row type="flex" justify="end" class="btn-container">
@@ -30,7 +34,6 @@
         :data="tableData"
         style="width: 100%">
         <el-table-column
-          fixed
           prop="name"
           label="姓名"
           width="120">
@@ -52,22 +55,14 @@
           label="年龄">
         </el-table-column>
         <el-table-column
-          prop="role"
           label="角色">
           <template slot-scope="scope">
-            <el-tag v-if="scope.row.role === 'student'" type="success">
-              {{scope.row.role}}
-            </el-tag>
-            <el-tag v-if="scope.row.role === 'teacher'" type="info">
-              {{scope.row.role}}
-            </el-tag>
-            <el-tag v-if="scope.row.role === 'admin'">
-              {{scope.row.role}}
+            <el-tag v-for="item in scope.row.uToRList" size="mini" :key="item.id">
+              {{item.role.name}}
             </el-tag>
           </template>
         </el-table-column>
         <el-table-column
-          fixed="right"
           label="操作"
           width="150">
           <template slot-scope="scope">
@@ -87,7 +82,6 @@
     </div>
     <div class="pagination-container">
       <el-pagination
-        @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
         :current-page="pagination.number"
         :page-size="pagination.size"
@@ -95,61 +89,17 @@
         :total="pagination.total">
       </el-pagination>
     </div>
-
-
-    <el-dialog :title="isUpdateForm ? '修改用户':'添加新用户'" :visible.sync="formVisible">
-      <el-form :model="addForm" :rules="rules" ref="addForm" class="form-add" label-width="100px">
-        <el-form-item label="用户姓名：" prop="name">
-          <el-input v-model="addForm.name" placeholder="请输入姓名"></el-input>
-        </el-form-item>
-        <el-form-item label="登录名：">
-          <el-input v-model="addForm.loginName" placeholder="请输入姓名"></el-input>
-        </el-form-item>
-        <el-form-item label="密码：" prop="passWord">
-          <el-input :type="showPassword ? 'text':'password'" placeholder="请输入密码" v-model="addForm.passWord"></el-input>
-        </el-form-item>
-        <el-form-item>
-          <el-switch
-            v-model="showPassword"
-            active-text="显示密码">
-          </el-switch>
-        </el-form-item>
-        <el-form-item label="用户性别：">
-          <el-select v-model="addForm.sex" placeholder="请选择性别">
-            <el-option label="男" value="0"></el-option>
-            <el-option label="女" value="1"></el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="用户年龄：">
-          <el-input-number v-model="addForm.age" :min="1" :max="200"></el-input-number>
-        </el-form-item>
-        <el-form-item label="用户角色：">
-          <el-select multiple v-model="selectRoleList" placeholder="请选择">
-            <el-option
-              v-for="item in roleList"
-              :value="item.id"
-              :key="item.id"
-              :label="item.name"
-              >
-            </el-option>
-          </el-select>
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="formVisible = false">取 消</el-button>
-        <el-button v-if="isUpdateForm" type="success" @click="handleUpdate">修 改</el-button>
-        <el-button v-if="!isUpdateForm" type="success" @click="handleAdd">添 加</el-button>
-      </div>
-    </el-dialog>
   </div>
 </template>
 
 <script>
-  import Constant from '../global/Constant'
+  import Constant from '@/global/URLConstant'
+  import EventConstant from '@/global/EventConstant'
   export default {
     created() {
       this.getList();
-      this.getRoleList();
+//      this.getRoleList();
+      this.$bus.emit(EventConstant.SHOW_BACK_BTN, {show: false});
     },
     data() {
       return {
@@ -160,7 +110,7 @@
         },
         form: {
           name: '',
-          role: ''
+          roleCode: ''
         },
         formVisible: false,
         isUpdateForm: false,
@@ -172,7 +122,7 @@
           passWord: '',
           age: 0,
           sex: 0,
-          uToRList: []
+          roleIds: []
         },
         roleList: [],
         selectRoleList: [],
@@ -191,7 +141,8 @@
     },
     methods: {
       getList(){
-        this.$http.get(Constant.PATH_USER_LIST, {params: {'pageNumber': this.pagination.number - 1}}).then(response => {
+        this.form.pageNumber = this.pagination.number - 1;
+        this.$http.get(Constant.PATH_USER_LIST, {params: this.form}).then(response => {
           this.tableData = response.body.result.content;
           this.pagination.size = response.body.result.size;
           this.pagination.total = response.body.result.totalElements;
@@ -202,56 +153,18 @@
           this.roleList = response.body.result;
         });
       },
-      resetData(){
-        this.addForm = {};
-        this.selectRoleList = [];
-      },
-      handleSizeChange(){
-
-      },
       handleCurrentChange(currentPage){
         this.pagination.number = currentPage;
         this.getList();
       },
       openAdd(){
-        this.formVisible = true;
-        this.isUpdateForm = false;
-        this.resetData();
+        this.$router.push({name: 'userForm', params: {title: '添加用户'}});
       },
       openEdit(id){
-        this.resetData();
-        this.$http.get(Constant.PATH_USER + id).then(response => {
-          if (response.body.result.sex != null) {
-            response.body.result.sex += '';
-          }
-          this.addForm = response.body.result;
-          this.formVisible = true;
-          this.isUpdateForm = true;
-        });
+        this.$router.push({name: 'userForm', params: {title: '修改用户', id: id}});
       },
       handleDelete(id){
         this.openConfirm(id);
-      },
-      handleAdd() {
-        this.$refs.addForm.validate((valid) => {
-          if (valid) {
-            this.addForm.uToRList = this.selectRoleList;
-            this.$http.post(Constant.PATH_USER, this.addForm).then(response => {
-              this.formVisible = false;
-              this.getList();
-            });
-          }
-        });
-      },
-      handleUpdate(){
-        this.$refs.addForm.validate((valid) => {
-          if (valid) {
-            this.$http.put(Constant.PATH_USER + this.addForm.id, this.addForm).then(response => {
-              this.formVisible = false;
-              this.getList();
-            });
-          }
-        });
       },
       openConfirm(id) {
         this.$confirm('此操作将永久删除该数据, 是否继续?', '提示', {
@@ -308,5 +221,9 @@
 
   .form-add .el-select {
     width: 100%;
+  }
+
+  .el-tag {
+    margin-left: 5px;
   }
 </style>

@@ -26,7 +26,6 @@
           label="应用名">
         </el-table-column>
         <el-table-column
-          fixed="right"
           label="操作"
           width="150">
           <template slot-scope="scope">
@@ -54,28 +53,16 @@
         :total="pagination.total">
       </el-pagination>
     </div>
-
-
-    <el-dialog :title="isUpdateForm ? '修改应用':'添加新应用'" :visible.sync="formVisible">
-      <el-form :model="addForm" :rules="rules" ref="addForm" class="form-add" label-width="100px">
-        <el-form-item label="应用名称：" prop="name">
-          <el-input v-model="addForm.name" placeholder="请输入应用名称"></el-input>
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="formVisible = false">取 消</el-button>
-        <el-button v-if="isUpdateForm" type="success" @click="handleUpdate">修 改</el-button>
-        <el-button v-if="!isUpdateForm" type="success" @click="handleAdd">添 加</el-button>
-      </div>
-    </el-dialog>
   </div>
 </template>
 
 <script>
-  import Constant from '../global/Constant'
+  import Constant from '@/global/URLConstant'
+  import EventConstant from '@/global/EventConstant'
   export default {
     created() {
       this.getList();
+      this.$bus.emit(EventConstant.SHOW_BACK_BTN, {show: false});
     },
     data() {
       return {
@@ -87,20 +74,7 @@
         form: {
           name: ''
         },
-        formVisible: false,
-        isUpdateForm: false,
-        showPassword: false,
-        addForm: {
-          id: '',
-          name: ''
-        },
-        tableData: [],
-        rules: {
-          name: [
-            {required: true, message: '应用名不能为空', trigger: 'blur'},
-            {min: 1, max: 12, message: '长度在 1 到 12 个字符', trigger: 'blur'}
-          ]
-        }
+        tableData: []
       }
     },
     methods: {
@@ -119,40 +93,13 @@
         this.getList();
       },
       openAdd(){
-        this.formVisible = true;
-        this.isUpdateForm = false;
-        this.addForm = {};
+        this.$router.push({name: 'appForm', params: {title: '添加应用'}});
       },
       openEdit(id){
-        this.addForm = {};
-        this.$http.get(Constant.PATH_APPLICATION + id).then(response => {
-          this.addForm = response.body.result;
-          this.formVisible = true;
-          this.isUpdateForm = true;
-        });
+        this.$router.push({name: 'appForm', params: {title: '修改应用', id: id}});
       },
       handleDelete(id){
         this.openConfirm(id);
-      },
-      handleAdd() {
-        this.$refs.addForm.validate((valid) => {
-          if (valid) {
-            this.$http.post(Constant.PATH_APPLICATION, this.addForm).then(response => {
-              this.formVisible = false;
-              this.getList();
-            });
-          }
-        });
-      },
-      handleUpdate(){
-        this.$refs.addForm.validate((valid) => {
-          if (valid) {
-            this.$http.put(Constant.PATH_APPLICATION + this.addForm.id, this.addForm).then(response => {
-              this.formVisible = false;
-              this.getList();
-            });
-          }
-        });
       },
       openConfirm(id) {
         this.$confirm('此操作将永久删除该数据, 是否继续?', '提示', {
@@ -205,9 +152,5 @@
 
   .btn-container {
     padding: 20px;
-  }
-
-  .form-add .el-select {
-    width: 100%;
   }
 </style>

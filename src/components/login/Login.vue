@@ -6,7 +6,7 @@
       </el-row>
       <el-row type="flex" justify="start" class="row-center header-main">
         <el-col :span="2" class="row-center">
-          <img src="./../assets/logo.png"/>
+          <img src="../../assets/logo.png"/>
         </el-col>
         <el-col :span="6" class="row-center">
           <span class="title">
@@ -35,7 +35,7 @@
                         auto-complete="off"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="submitForm('loginForm')">提交</el-button>
+              <el-button type="primary" @click="submitForm('loginForm')">登&nbsp;&nbsp;录</el-button>
             </el-form-item>
           </el-form>
         </el-col>
@@ -45,7 +45,7 @@
 </template>
 
 <script>
-  import Constant from '../global/Constant'
+  import Constant from '@/global/URLConstant'
   export default {
     data () {
       return {
@@ -69,8 +69,9 @@
       submitForm(formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
-            this.$http.post('http://localhost:8080/user/login', this.loginForm).then(response => {
+            this.$http.post(Constant.PATH_LOGIN, this.loginForm).then(response => {
               if (response.body.code == 1) {
+                sessionStorage.setItem("userInfo", JSON.stringify(response.body.result));
                 this.$router.push('/admin-main');
               }
             });
@@ -83,7 +84,7 @@
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="less" scoped>
-  @import './../style';
+  @import '../../style';
   .row-center {
     align-items: center;
   }
@@ -118,7 +119,7 @@
     background: #fff;
     padding: 0 1.33em;
     box-shadow: 0 0 2px #888;
-    margin-top: 100px;
+    margin-top: 50px;
   }
 
   .login-text {

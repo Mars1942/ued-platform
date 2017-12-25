@@ -7,11 +7,13 @@ import './style.less'
 import App from './App.vue'
 import router from './router'
 import VueResource from 'vue-resource'
+import VueBus from 'vue-bus';
 
 
 Vue.config.productionTip = false;
 Vue.use(ElementUI);
 Vue.use(VueResource);
+Vue.use(VueBus);
 Vue.http.interceptors.push(function (request, next) {
   const loading = this.$loading({
     lock: true,
