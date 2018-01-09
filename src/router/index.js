@@ -11,6 +11,9 @@ import RoleList from '@/components/role/RoleList'
 import RoleForm from '@/components/role/RoleForm'
 import CourseList from '@/components/course/CourseList'
 import CourseForm from '@/components/course/CourseForm'
+import CourseSelectList from '@/components/course/CourseSelectList'
+import CourseMyList from '@/components/course/CourseMyList'
+import CourseToUserList from '@/components/course/CourseToUserList'
 
 Vue.use(Router)
 
@@ -27,7 +30,6 @@ export default new Router({
       path: '/admin-main',
       name: 'AdminMain',
       component: AdminMain,
-      redirect:'/admin-main/user-list',
       children: [
         {
           path: 'user-list',
@@ -59,6 +61,21 @@ export default new Router({
         {
           path: 'course-list',
           component: CourseList
+        },
+        {
+          path: 'course-select',
+          name:'courseSelectList',
+          component: CourseSelectList
+        },
+        {
+          path: 'course-my-list',
+          name:'courseMyList',
+          component: CourseMyList
+        },
+        {
+          path: 'course-to-userList',
+          name:'courseToUserList',
+          component: CourseToUserList
         },
         {
           path:'course-form',

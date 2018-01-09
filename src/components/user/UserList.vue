@@ -17,7 +17,7 @@
         </el-select>
       </el-form-item>
       <el-form-item>
-        <el-input type="input" placeholder="关键字" prefix-icon="el-icon-search" v-model="form.name"></el-input>
+        <el-input type="input" placeholder="用户姓名" prefix-icon="el-icon-search" v-model="form.name"></el-input>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="getList()">查询</el-button>
@@ -78,7 +78,6 @@
           </template>
         </el-table-column>
       </el-table>
-
     </div>
     <div class="pagination-container">
       <el-pagination
@@ -98,7 +97,7 @@
   export default {
     created() {
       this.getList();
-//      this.getRoleList();
+      this.getRoleList();
       this.$bus.emit(EventConstant.SHOW_BACK_BTN, {show: false});
     },
     data() {
@@ -142,7 +141,7 @@
     methods: {
       getList(){
         this.form.pageNumber = this.pagination.number - 1;
-        this.$http.get(Constant.PATH_USER_LIST, {params: this.form}).then(response => {
+        this.$http.get(Constant.PATH_USER_PAGE_BY_PARAM, {params: this.form}).then(response => {
           this.tableData = response.body.result.content;
           this.pagination.size = response.body.result.size;
           this.pagination.total = response.body.result.totalElements;

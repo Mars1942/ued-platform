@@ -8,6 +8,9 @@
         <el-form-item label="角色名称：" prop="name">
           <el-input v-model="form.name" placeholder="请输入角色名称"></el-input>
         </el-form-item>
+        <el-form-item label="角色code：" prop="code">
+          <el-input v-model="form.code" placeholder="请输入角色编码"></el-input>
+        </el-form-item>
         <el-form-item label="功能：">
           <el-select multiple v-model="selectApplicationList" placeholder="请选择">
             <el-option
@@ -53,7 +56,8 @@
         title: this.$route.params.title,
         form: {
           id: this.$route.params.id,
-          name: ''
+          name: '',
+          code:''
         },
         applicationList: [],
         selectApplicationList: [],

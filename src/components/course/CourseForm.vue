@@ -23,11 +23,11 @@
           <el-input v-model="form.memo" placeholder="请输入备注" :disabled="!edit && step == 1"></el-input>
         </el-form-item>
         <el-form-item label="任课教师：">
-          <el-select v-model="form.teacherId" placeholder="请选择" :disabled="!edit && step == 1">
+          <el-select v-model="form.teacher" placeholder="请选择" :disabled="!edit && step == 1">
             <el-option
               v-for="item in teacherList"
               :key="item.id"
-              :value="item.id"
+              :value="item"
               :label="item.name"
             >
             </el-option>
@@ -69,13 +69,13 @@
               v-if="containsUser"
               size="mini"
               type="danger"
-              @click="handleDelete(scope.row.id)">解除绑定
+              @click="handleDeleteUser(scope.row.id)">解除绑定
             </el-button>
             <el-button
               v-if="!containsUser"
               size="mini"
               type="success"
-              @click="handleDelete(scope.row.id)">添加
+              @click="handleAddUser(scope.row.id)">添加
             </el-button>
           </template>
         </el-table-column>
@@ -110,7 +110,10 @@
         this.step = 1;
         this.$http.get(Constant.PATH_COURSE + this.form.id).then(response => {
           this.form = response.body.result;
-          this.form.teacherId = this.form.teacher.id;
+          this.form.teacher={
+            id:this.form.teacherId,
+            name:this.form.teacherName
+          }
         });
       }
     },
@@ -144,15 +147,27 @@
       }
     },
     methods: {
+      handleAddUser(id) {
+        this.$http.post(Constant.PATH_COURSE + this.form.id + "/user", {id:id}).then(response => {
+          this.showContainsUser(false);
+        });
+      },
+      handleDeleteUser(id) {
+        this.$http.delete(Constant.PATH_COURSE_DEL_USER + this.form.id, {params:{userId:id}}).then(response => {
+          this.showContainsUser(true);
+        });
+      },
       showContainsUser(flag){
         this.dialogVisible = true;
         this.containsUser = flag;
         if (this.containsUser) {
-          this.$http.get(Constant.PATH_USER_LIST_ALL).then(response => {
+          //已选
+          this.$http.get(Constant.PATH_USER_LIST_BY_PARAM,{params:{courseId:this.form.id,isSel:1,roleCode:'002'}}).then(response => {
             this.showUserList = response.body.result;
           });
         } else {
-          this.$http.get(Constant.PATH_USER_LIST_ALL).then(response => {
+          //未选
+          this.$http.get(Constant.PATH_USER_LIST_BY_PARAM,{params:{courseId:this.form.id,isSel:0,roleCode:'002'}}).then(response => {
             this.showUserList = response.body.result;
           });
         }
@@ -162,17 +177,15 @@
         this.getList();
       },
       getTeacherList(){
-        this.$http.get(Constant.PATH_USER_LIST_BY_COURSE,{params:{roleCode:'001'}}).then(response => {
+        this.$http.get(Constant.PATH_USER_LIST_BY_PARAM,{params:{roleCode:'001'}}).then(response => {
           this.teacherList = response.body.result;
         });
       },
       handleAdd() {
         this.$refs.form.validate((valid) => {
           if (valid) {
-            var id = this.form.teacherId;
-            this.form.teacher = {
-              id: id
-            };
+            this.form.teacherId = this.form.teacher.id;
+            this.form.teacherName = this.form.teacher.name;
             this.$http.post(Constant.PATH_COURSE, this.form).then(response => {
                 this.step = 1;
                 this.form.id = response.body.result;

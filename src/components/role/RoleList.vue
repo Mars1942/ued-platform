@@ -5,10 +5,10 @@
     </div>
     <el-form ref="form" :inline="true" :model="form" class="form-search">
       <el-form-item>
-        <el-input type="input" placeholder="关键字" prefix-icon="el-icon-search" v-model="form.name"></el-input>
+        <el-input type="input" placeholder="用户名称" prefix-icon="el-icon-search" v-model="form.name"></el-input>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary">查询</el-button>
+        <el-button type="primary"  @click="getList()">查询</el-button>
       </el-form-item>
     </el-form>
     <el-row type="flex" justify="end" class="btn-container">
@@ -81,7 +81,8 @@
     },
     methods: {
       getList(){
-        this.$http.get(Constant.PATH_ROLE_LIST, {params: {'pageNumber': this.pagination.number - 1}}).then(response => {
+        this.form.pageNumber = this.pagination.number - 1;
+        this.$http.get(Constant.PATH_ROLE_LIST, {params: this.form}).then(response => {
           this.tableData = response.body.result.content;
           this.pagination.size = response.body.result.size;
           this.pagination.total = response.body.result.totalElements;

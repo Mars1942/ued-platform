@@ -9,7 +9,7 @@
           <el-input v-model="form.name" placeholder="请输入姓名"></el-input>
         </el-form-item>
         <el-form-item label="登录名：">
-          <el-input v-model="form.loginName" placeholder="请输入姓名"></el-input>
+          <el-input v-model="form.loginName" @blur="a" placeholder="请输入姓名"></el-input>
         </el-form-item>
         <el-form-item label="密码：" prop="passWord">
           <el-input :type="showPassword ? 'text':'password'" placeholder="请输入密码" v-model="form.passWord"></el-input>
@@ -87,6 +87,9 @@
             {required: true, message: '用户名不能为空', trigger: 'blur'},
             {min: 1, max: 12, message: '长度在 1 到 12 个字符', trigger: 'blur'}
           ],
+          loginName: [
+            {required: true, message: '用户名不能为空', trigger: 'blur'}
+          ],
           passWord: [
             {required: true, message: '密码不能为空', trigger: 'blur'},
             {min: 1, max: 12, message: '长度在 1 到 12 个字符', trigger: 'blur'}
@@ -117,6 +120,9 @@
             });
           }
         });
+      },
+      a() {
+        alert(this)
       }
     }
   }

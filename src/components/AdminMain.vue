@@ -23,22 +23,15 @@
     <div class="main-container">
       <el-container class="el-main-container">
         <el-aside width="200px">
-          <el-menu default-active="/admin-main/user-list" router>
-            <el-menu-item index="/admin-main/user-list">
-              <i class="el-icon-fa-user-o"></i>
-              <span>用户管理</span>
-            </el-menu-item>
-            <el-menu-item index="/admin-main/app-list">
-              <i class="el-icon-menu"></i>
-              <span>应用管理</span>
-            </el-menu-item>
-            <el-menu-item index="/admin-main/role-list">
-              <i class="el-icon-fa-user-secret"></i>
-              <span>角色管理</span>
-            </el-menu-item>
-            <el-menu-item index="/admin-main/course-list">
-              <i class="el-icon-fa-graduation-cap"></i>
-              <span>课程管理</span>
+          <el-menu  router>
+            <el-menu-item
+              v-for="item in applicationList"
+              :key="item.id"
+              :index="item.url"
+            >
+              <i v-if="item.icon" :class="item.icon"></i>
+              <i class="el-icon-menu" v-else></i>
+              <span>{{item.name}}</span>
             </el-menu-item>
           </el-menu>
         </el-aside>
@@ -51,11 +44,13 @@
   </el-container>
 </template>
 <script>
+  import Constant from '@/global/URLConstant'
   import ElRow from "element-ui/packages/row/src/row";
   import ElCol from "element-ui/packages/col/src/col";
   import EventConstant from '@/global/EventConstant';
   export default {
     created() {
+      this.getApplicationList();
       this.$bus.on(EventConstant.SHOW_BACK_BTN, (data)=>{
         this.showBackBtn = data.show;
       });
@@ -70,10 +65,19 @@
     data() {
       return {
         userInfo: JSON.parse(sessionStorage.getItem("userInfo")),
-        showBackBtn:false
+        showBackBtn:false,
+        applicationList:[],
       }
     },
     methods: {
+      getApplicationList() {
+        this.$http.get(Constant.PATH_APPLICATION_LIST_BY_USER + this.userInfo.id).then(response => {
+          this.applicationList = response.body.result;
+          if (this.applicationList != null) {
+            this.$router.push({path: this.applicationList[0].url, params: { title:this.applicationList[0].name}});
+          }
+        });
+      },
       logoff(){
         sessionStorage.removeItem("userInfo");
         this.$router.push('/');

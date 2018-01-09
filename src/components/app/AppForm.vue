@@ -8,6 +8,12 @@
         <el-form-item label="应用名称：" prop="name">
           <el-input v-model="form.name" placeholder="请输入应用名称"></el-input>
         </el-form-item>
+        <el-form-item label="应用路径：" prop="url">
+          <el-input v-model="form.url" placeholder="应用路径"></el-input>
+        </el-form-item>
+        <el-form-item label="应用图标：" prop="url">
+          <el-input v-model="form.icon" placeholder="应用路径"></el-input>
+        </el-form-item>
         <el-form-item>
           <el-button @click="$router.back(-1)">返 回</el-button>
           <el-button v-if="form.id" type="success" @click="handleUpdate">修 改</el-button>
@@ -34,12 +40,17 @@
         title: this.$route.params.title,
         form: {
           id: this.$route.params.id,
-          name: ''
+          name: '',
+          url:'',
+          icon:'',
         },
         rules: {
           name: [
             {required: true, message: '应用名不能为空', trigger: 'blur'},
             {min: 1, max: 12, message: '长度在 1 到 12 个字符', trigger: 'blur'}
+          ],
+          url:[
+            {required: true, message: '应用路径不能为空', trigger: 'blur'}
           ]
         }
       }
@@ -49,6 +60,7 @@
         this.$refs.form.validate((valid) => {
           if (valid) {
             this.$http.post(Constant.PATH_APPLICATION, this.form).then(response => {
+              this.$router.back(-1);
             });
           }
         });
